@@ -2,54 +2,56 @@ body {
   background: #efefef;
   font-size: 18px;
 }
-
+.dateForm {
+  width: 200px;
+}
 .wrapper {
   position: relative; }
 
-#datePicker {
+.datePicker {
   display: inline-block;
   margin-right: 2em;
   color: #ffffff;
 }
-#datePicker .month, #datePicker .year {
+.datePicker .month, .datePicker .year {
   padding: .5em;
 }
 
-#datePicker table {
+.datePicker table {
   border-collapse: collapse; 
 
 }
-#datePicker .headerDatePicker {
+.datePicker .headerDatePicker {
 
   background: #526e82;
   position: relative; 
   text-align: center;
 }
 
-#datePicker .calendar table th.dayOfWeek {
+.datePicker .calendar table th.dayOfWeek {
 
   background: #4cd9c0;
   color: #3dad99;
   padding: .4em;
 
 }
-#datePicker .calendar tr td.today.active span {
+.datePicker .calendar tr td.today.active span {
   background: #357ebd;
   color: #ffffff;
 }
-#datePicker .calendar tr td.today span {
+.datePicker .calendar tr td.today span {
   background: #0c8cca;
   border-radius: 50%;
   color: #ffffff;
 }
 
-#datePicker table tr td:first-child {
+.datePicker table tr td:first-child {
   border-left: 0; 
 }
-#datePicker table tr td:last-child {
+.datePicker table tr td:last-child {
   border-right: 0; 
 }
-#datePicker table tr td {
+.datePicker table tr td {
   background: #ffffff;
   height: 20px;
   width: 20px;
@@ -59,33 +61,33 @@ body {
   color: #32635a;
   
 }
-#datePicker .calendar table tbody td.start-date {
+.datePicker .calendar table tbody td.start-date {
   border-radius: 4px 0 0 4px;
 }
-#datePicker .calendar table tbody td.end-date {
+.datePicker .calendar table tbody td.end-date {
  border-radius: 0 4px 4px 0; 
 }
-#datePicker .calendar table tbody td.active {
+.datePicker .calendar table tbody td.active {
   background: #357ebd;
   color : #ffffff; 
 }
-#datePicker .calendar table tbody td.in-range {
+.datePicker .calendar table tbody td.in-range {
   background: #ceebf9;
 }
-#datePicker .calendar table tbody td.off {
+.datePicker .calendar table tbody td.off {
   color : #999;
 }
-#datePicker .calendar table tbody td span {
+.datePicker .calendar table tbody td span {
   display: block;
   padding: .4em;
 }
 
-#datePicker .calendar table tbody td span:not(.dayOfWeek):not(.today): hover {
+.datePicker .calendar table tbody td span:not(.dayOfWeek):not(.today): hover {
     background-color: #3bc8b0;
     border-radius: 50%;
   
 }
-#datePicker .nextMonth {
+.datePicker .nextMonth {
   font-family:'Fira Code';
   position: absolute;
   right: 0;
@@ -97,7 +99,7 @@ body {
   transform: translate(0,-50%);
 
 }
-#datePicker .previousMonth {
+.datePicker .previousMonth {
   font-family:'Fira Code';
   position: absolute;
   z-index: 10;

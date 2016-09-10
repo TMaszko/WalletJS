@@ -60,18 +60,18 @@ window.addEventListener('load', function () {
 		}
 		return date;
 	}
-	Date.prototype.isSame = function(target , subj) {
+	Date.prototype.isSame = function(target, subj) {
 		var date = this.clone();
 		if (subj == 'day') {
 			return	target.getFullYear() == date.getFullYear() && date.getMonth() == target.getMonth() && date.getDate() == target.getDate();
 		}
 	}
-	Node.prototype.parents = function(selec) {
+	Node.prototype.parents = function (selec) {
 		var searching,found=false;
 		if ( document.querySelectorAll(selec)) {
-			for(var i = 0 ; i < document.querySelectorAll(selec).length && !found; i++) {
+			for (var i = 0 ; i < document.querySelectorAll(selec).length && !found; i++) {
 				searching = this;
-				while(searching && searching != document.querySelectorAll(selec)[i]) {
+				while (searching && searching != document.querySelectorAll(selec)[i]) {
 						searching = searching.parentNode; 
 				}
 				if (searching) {
@@ -88,6 +88,7 @@ function DateRangePicker() {
 	this.locale = {
 		firstDay: 1,
 		daysOfWeek: ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So'],
+		months: ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paz', 'Lis', 'Gru'],
 
 	};
 	this.leftCalendar = {};
@@ -96,6 +97,8 @@ function DateRangePicker() {
 	this.updateDayOfWeek();
 	this.updateMonthsInView();
 	this.updateView();
+	this.bindEventsOnce();
+
  
 	
 
@@ -243,12 +246,41 @@ function DateRangePicker() {
 			}
 			return calendar;	
 		},
-		bindEvents : function () {
+		bindEvents: function () {
 			[].slice.call(document.querySelectorAll('.calendar td.available')).forEach(function(el) {
 					el.addEventListener('click', this.clickDate.bind(this));
 					el.addEventListener('mouseover',this.hoverDate.bind(this));
 			}.bind(this));
 		},
+		bindEventsOnce: function () { 
+			var that =this;
+			[].slice.call(document.querySelectorAll('.nextMonth')).forEach( function (el) {
+			el.addEventListener('click' , this.changeMonth.bind(this));
+			}.bind(this));
+
+			[].slice.call(document.querySelectorAll('.previousMonth')).forEach( function (el) {
+				el.addEventListener('click' , this.changeMonth.bind(this));
+			}.bind(this));
+			var inputLeft = document.querySelector('.dateForm' + '.left'),
+				inputRight = document.querySelector('.dateForm' +'.right'); // refactor
+			inputLeft.addEventListener('keyup', function() {
+				var arr = this.value.split('/');
+				var arrRight = inputRight.value.split('/');
+				that.startDate = new Date(arr[2], arr[1]-1, arr[0]);
+				that.endDate = new Date(arrRight[2], arrRight[1]-1,arrRight[0]);
+				that.updateMonthsInView();
+				that.updateView();
+			})
+			inputRight.addEventListener('keyup', function() {
+				var arr = this.value.split('/');
+				var arrLeft = inputLeft.value.split('/');
+				that.startDate = new Date(arrLeft[2], arrLeft[1]-1, arrLeft[0]);
+				that.endDate = new Date(arr[2], arr[1]-1,arr[0]);
+				that.updateMonthsInView();
+				that.updateView();
+			})
+		},
+		
 		clickDate: function(e) {
 			if (!e.target.parentNode.classList.contains('available')){
 				return;
@@ -258,14 +290,14 @@ function DateRangePicker() {
 			 	col = title.substr(3, 1),
 			 	cal = e.target.parents('.calendar'),
 			 	date = cal.classList.contains('left') ? this.leftCalendar.calendar[row][col] : this.rightCalendar.calendar[row][col];
-			console.log(cal) ;
-			if ( this.startDate && date.getTime() == this.startDate.getTime()) {
+
+
+			if (this.startDate && date.getTime() == this.startDate.getTime()) {
 				this.startDate = null;
 			} else if ( this.endDate && date.getTime() == this.endDate.getTime()) {
 				this.endDate = null;
 			} else if ( !this.startDate  && !this.endDate) {
 				this.startDate = date.clone();
-
 			} else	if (!this.startDate && this.endDate  && date < this.endDate) { // picking start
 				this.startDate = date.clone();
 				console.log(this.startDate);
@@ -276,15 +308,53 @@ function DateRangePicker() {
 			this.updateView();
 
 		},
+		changeMonth: function (e) {
+			var parent = e.target.parents('.right') || e.target.parents('.left'),
+			 	side = parent.classList.contains('left') ? 'left' : 'right',
+			 	btn = e.target.classList.contains('nextMonth') ? 'next' : 'prev';
+			 	console.log("side :"  + side);
+			 	console.log("btn: " + btn);
+
+
+			if( side == 'left' && btn == 'prev' ) {
+
+				this.leftCalendar.month = this.leftCalendar.month.substract(1,'month');
+				this.rightCalendar.month = this.rightCalendar.month.substract(1,'month');
+
+			} else if ( side == 'left' && btn == 'next') {
+
+				this.leftCalendar.month = this.leftCalendar.month.substract(-1,'month'); // make add function later
+				this.rightCalendar.month = this.rightCalendar.month.substract(-1,'month');
+				console.log('month +1');
+
+			} else if ( side == 'right' && btn == 'next') {
+
+				this.leftCalendar.month = this.leftCalendar.month.substract(-1,'month'); // make add function later
+				this.rightCalendar.month = this.rightCalendar.month.substract(-1,'month');
+
+			} else if ( side == 'right' && btn == 'prev') {
+
+				this.leftCalendar.month = this.leftCalendar.month.substract(1,'month'); 
+				this.rightCalendar.month = this.rightCalendar.month.substract(1,'month');
+
+			}
+			console.log(this.startDate);
+			this.updateView();
+		},
+
 		hoverDate: function(e) {
 			var	leftCalendar = this.leftCalendar,
-				rightCalendar = this.rightCalendar;
+				rightCalendar = this.rightCalendar,
 				title = e.target.parentNode.getAttribute('data-title') || e.target.getAttribute('data-title'),	
 			 	row = title.substr(1, 1),
 			 	col = title.substr(3, 1),
-			 	cal = e.target.parents('.calendar'), 
+			 	cal = e.target.parents('.calendar'),
 			 	date = cal.classList.contains('left') && row && col ? this.leftCalendar.calendar[row][col] : this.rightCalendar.calendar[row][col],
-				startDate = this.startDate;
+				startDate = this.startDate,
+				inputLeft = document.querySelector('.dateForm' + '.left'),
+				inputRight = document.querySelector('.dateForm' +'.right');
+
+				
 
 				if ( !this.endDate && startDate ) {
 					[].slice.call(document.querySelectorAll('.calendar td')).forEach( function(el, index) {
@@ -303,12 +373,17 @@ function DateRangePicker() {
 						 		el.classList.remove('in-range');
 						 	}
 
+						 	inputLeft.value = this.formatDate(startDate);
+						 	inputRight.value = this.formatDate(date);
+
 					}.bind(this));
 
 				} else if ( !startDate && this.endDate) {
 						[].slice.call(document.querySelectorAll('.calendar td')).forEach( function(el, index) {
+
 						if(el.classList.contains('dayOfWeek'))
 							return;
+
 						var title = el.getAttribute('data-title');
 						 	row = title.substr(1, 1),
 						 	col = title.substr(3, 1),
@@ -321,8 +396,10 @@ function DateRangePicker() {
 						 		el.classList.remove('in-range');
 						 	}
 
-					}.bind(this));
+						 	inputRight.value = this.formatDate(this.endDate);
+						 	inputLeft.value = this.formatDate(date);
 
+					}.bind(this));
 				}
 		},
 		
@@ -330,8 +407,33 @@ function DateRangePicker() {
 
 			this.renderCalendar('left');
 			this.renderCalendar('right');
+			this.renderLabel('left');
+			this.renderLabel('right');
 			this.bindEvents();
-		}
+		},
+		renderLabel: function (side) {
+
+			var month = this.locale.months[this[side+"Calendar"].month.getMonth()];
+			var year = this[side+'Calendar'].month.getFullYear();
+			document.querySelector('.' + side + ' .month').textContent = month;
+			document.querySelector('.' + side + ' .year').textContent = year;
+
+		},
+		formatDate : function (date) {
+			var year = date.getFullYear();
+			var month = date.getMonth() +1;
+			var day = date.getDate();
+
+			if ( month < 10) {
+				month = '0'+ month;
+			}
+			if ( day < 10) {
+				day = '0' + day;
+			}
+
+			return day +'/' + month +'/' + year;
+
+		},
 	
 	};
 	var datePicker = new DateRangePicker();
